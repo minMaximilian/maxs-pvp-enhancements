@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "minmaximilian.reclaim.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "FireBlockMixin",
+    "ItemEntityMixin",
+    "PickupDelayMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

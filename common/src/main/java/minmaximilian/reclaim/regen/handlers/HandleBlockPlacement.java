@@ -2,7 +2,7 @@ package minmaximilian.reclaim.regen.handlers;
 
 import java.util.Objects;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import minmaximilian.reclaim.block.WallPlaster;
 import minmaximilian.reclaim.regen.ChunkData;
@@ -24,7 +24,7 @@ public class HandleBlockPlacement {
         BlockState placedBlock, BlockPos blockPos) {
         if (entity instanceof Player) {
             Block block = placedBlock.getBlock();
-            ChunkTracker chunkTracker = ChunkData.getChunkTracker(levelAccessor.dimensionType().effectsLocation(),
+            ChunkTracker chunkTracker = ChunkData.getChunkTracker(((Level) levelAccessor).dimension().location(),
                 new ChunkPos((blockPos)));
             ServerLevel level = Objects.requireNonNull(levelAccessor.getServer().overworld());
             if (chunkTracker != null && chunkTracker.get(blockPos) != null && block instanceof WallPlaster) {
@@ -40,7 +40,7 @@ public class HandleBlockPlacement {
             return;
         }
         Block block = level.getBlockState(blockPos).getBlock();
-        ChunkTracker chunkTracker = ChunkData.getChunkTracker(level.dimensionType().effectsLocation(),
+        ChunkTracker chunkTracker = ChunkData.getChunkTracker(level.dimension().location(),
             new ChunkPos((blockPos)));
         if (chunkTracker != null && chunkTracker.get(blockPos) != null && block instanceof WallPlaster) {
             HealChunk.healBlockTrackerWithoutPop(level, chunkTracker.remove(blockPos));

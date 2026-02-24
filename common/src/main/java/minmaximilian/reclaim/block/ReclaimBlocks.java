@@ -1,37 +1,30 @@
 package minmaximilian.reclaim.block;
 
-import static minmaximilian.reclaim.Reclaim.REGISTRATE;
+import static minmaximilian.reclaim.Reclaim.MOD_ID;
 
-import com.tterrag.registrate.builders.BlockBuilder;
-import com.tterrag.registrate.util.entry.BlockEntry;
-import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-
-import minmaximilian.reclaim.IndexPlatform;
-import net.minecraft.tags.BlockTags;
+import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
+import minmaximilian.reclaim.item.ReclaimItems;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class ReclaimBlocks {
 
-    public static final BlockEntry<WallPlaster> WALL_PLASTER = REGISTRATE
-        .block("wall_plaster", WallPlaster::new)
-        .properties(p -> p.sound(SoundType.GRAVEL))
-        .transform(shovel())
-        .lang("Wall Plaster")
-        .simpleItem()
-        .register();
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(MOD_ID, Registries.BLOCK);
 
-    static {
-        IndexPlatform.useBaseTab();
-    }
+    public static final RegistrySupplier<WallPlaster> WALL_PLASTER = BLOCKS.register("wall_plaster",
+        () -> new WallPlaster(BlockBehaviour.Properties.ofFullCopy(Blocks.SAND).sound(SoundType.GRAVEL)));
 
-    @SuppressWarnings("EmptyMethod")
+    // Register block items in the item registry
+    public static final RegistrySupplier<BlockItem> WALL_PLASTER_ITEM = ReclaimItems.ITEMS.register("wall_plaster",
+        () -> new BlockItem(WALL_PLASTER.get(), new Item.Properties()));
+
     public static void register() {
-    }
-
-    private static <T extends Block, P> NonNullUnaryOperator<BlockBuilder<T, P>> shovel() {
-        return b -> b.initialProperties(() -> Blocks.SAND)
-            .tag(BlockTags.MINEABLE_WITH_SHOVEL);
+        BLOCKS.register();
     }
 }

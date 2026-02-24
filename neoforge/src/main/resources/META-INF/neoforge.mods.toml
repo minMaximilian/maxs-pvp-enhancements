@@ -1,0 +1,32 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "LGPL"
+
+[[mixins]]
+config = "reclaim.mixins.json"
+
+[[mixins]]
+config = "reclaim-common.mixins.json"
+
+[[mods]]
+modId = "reclaim"
+version = "${version}"
+displayName = "Reclaim"
+authors = "github.com/minMaximilian"
+description = '''
+Reclaim, set to make PvP as an event to look forwards to and reduce sadness after destruction.
+'''
+
+[[dependencies.reclaim]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.reclaim]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,)"
+ordering = "NONE"
+side = "BOTH"

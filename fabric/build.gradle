@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.gradleup.shadow" version "8.3.6"
 }
 
 architectury {
@@ -13,13 +13,12 @@ loom {
 
     runs {
         datagen {
-            client()
+            server()
 
             name "Minecraft Data"
             vmArg "-Dfabric-api.datagen"
             vmArg "-Dfabric-api.datagen.output-dir=${common.file("src/generated/resources")}"
             vmArg "-Dfabric-api.datagen.modid=reclaim"
-            vmArg "-Dporting_lib.datagen.existing_resources=${common.file("src/main/resources")}"
         }
     }
 }
@@ -33,17 +32,11 @@ configurations {
 }
 
 repositories {
-    // mavens for Fabric-exclusives
     mavenCentral()
-    maven { url = "https://maven.realrobotix.me/master" }
-    maven { url = "https://api.modrinth.com/maven" } // LazyDFU
-    maven { url = "https://maven.terraformersmc.com/releases/" } // Mod Menu
-    maven { url = "https://mvn.devos.one/snapshots/" }
-    // Create Fabric, Porting Lib, Forge Tags, Milk Lib, Registrate Fabric
-    maven { url = "https://cursemaven.com" } // Forge Config API Port
-    maven { url = "https://maven.cafeteria.dev/releases" } // Fake Player API
-    maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
-    maven { url = "https://jitpack.io/" } // Mixin Extras, Fabric ASM
+    maven { url = "https://maven.architectury.dev/" }
+    maven { url = "https://maven.shedaniel.me/" }
+    maven { url = "https://maven.terraformersmc.com/releases/" }
+    maven { url = "https://api.modrinth.com/maven" } // Forge Config API Port
 }
 
 dependencies {
@@ -51,46 +44,15 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive = false }
 
-    implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
-
     // dependencies
     modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_api_version}")
-    modImplementation(include("com.tterrag.registrate_fabric:Registrate:${registrate_fabric_version}"))
-    modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:$fabric_config_port"))
-    modImplementation(include("com.electronwill.night-config:core:$night_config_version"))
-    modImplementation(include("com.electronwill.night-config:toml:$night_config_version"))
+    modImplementation("dev.architectury:architectury-fabric:${architectury_api_version}")
 
-    // DataGen
-    modLocalRuntime(include("io.github.fabricators_of_create.Porting-Lib:data:${project.porting_lib_version}")) { exclude(group: "io.vram") }
-
-    // Compatibilities
-    modCompileOnly("com.simibubi.create:create-fabric-${minecraft_version}:${create_fabric_version}") { transitive = false }
-    modCompileOnly("com.rbasamoyai:createbigcannons-fabric-${minecraft_version}:${cbc_version}") { transitive = false }
-
-    // Test Compatibilities
-    modLocalRuntime("com.simibubi.create:create-fabric-${minecraft_version}:${create_fabric_version}")
-    modLocalRuntime("com.rbasamoyai:createbigcannons-fabric-${minecraft_version}:${cbc_version}")
-
-    // Development QOL
-    modLocalRuntime("maven.modrinth:lazydfu:${lazydfu_version}")
-    modLocalRuntime("com.terraformersmc:modmenu:${modmenu_version}")
-
-    // Recipe Viewers - Create Fabric supports JEI, REI, and EMI.
-    // See root gradle.properties to choose which to use at runtime.
-    switch (fabric_recipe_viewer.toLowerCase(Locale.ROOT)) {
-        case "jei": modLocalRuntime("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"); break
-        case "rei": modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"); break
-        case "emi": modLocalRuntime("dev.emi:emi:${emi_version}"); break
-        case "disabled": break
-        default: println("Unknown recipe viewer specified: ${fabric_recipe_viewer}. Must be JEI, REI, EMI, or disabled.")
-    }
-    // if you would like to add integration with them, uncomment them here.
-//    modCompileOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
-//    modCompileOnly("mezz.jei:jei-${minecraft_version}-common:${jei_version}")
-//    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${rei_version}")
-//    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${rei_version}")
-//    modCompileOnly("dev.emi:emi:${emi_version}")
+    // Forge Config API Port
+    modImplementation("maven.modrinth:forge-config-api-port:v${forge_config_api_port_version}-1.21.1-Fabric")
+    // NightConfig (required at runtime by Forge Config API Port, bundled via JiJ but not extracted in dev)
+    runtimeOnly("com.electronwill.night-config:core:3.8.0")
+    runtimeOnly("com.electronwill.night-config:toml:3.8.0")
 }
 
 processResources {
@@ -103,8 +65,7 @@ processResources {
         "version", version,
         "fabric_loader_version", fabric_loader_version,
         "fabric_api_version", fabric_api_version,
-        "minecraft_version", minecraft_version,
-        "create_version", create_fabric_version // on fabric, use the entire version, unlike forge
+        "minecraft_version", minecraft_version
     )
     properties.forEach((k, v) -> inputs.property(k, v))
 
@@ -117,18 +78,18 @@ shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier.set("dev-shadow")
 }
 
 remapJar {
     injectAccessWidener = true
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier null
+    archiveClassifier.set((String) null)
 }
 
 jar {
-    classifier "dev"
+    archiveClassifier.set("dev")
 }
 
 sourcesJar {

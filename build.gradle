@@ -1,8 +1,6 @@
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.0-SNAPSHOT" apply false
-    id "io.github.juuxel.loom-quiltflower" version "1.+" apply false // Quiltflower, a better decompiler
-    id "io.github.p03w.machete" version "1.+" // automatic jar compressing on build
+    id "dev.architectury.loom" version "1.11-SNAPSHOT" apply false
 }
 
 architectury {
@@ -23,7 +21,6 @@ boolean ci = System.getenv("CI") != null ? System.getenv("CI").toBoolean() : fal
 subprojects {
     apply plugin: "maven-publish"
     apply plugin: "dev.architectury.loom"
-    apply plugin: "io.github.juuxel.loom-quiltflower"
 
     loom {
         silentMojangMappingsLicense()
@@ -32,25 +29,17 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url = "https://maven.shedaniel.me/" } // Cloth Config, REI
-        maven { url = "https://modmaven.dev" } // location of a maven mirror for JEI files, as a fallback
+        maven { url = "https://modmaven.dev" } // JEI
         maven { url = "https://maven.parchmentmc.org" } // Parchment mappings
-        maven { url = "https://maven.quiltmc.org/repository/release" } // Quilt Mappings
-        maven { // Flywheel
-            url = "https://maven.tterrag.com/"
-            content {
-                // need to be specific here due to version overlaps
-                includeGroup("com.jozufozu.flywheel")
-            }
-        }
+        maven { url = "https://maven.architectury.dev/" } // Architectury API
     }
 
     dependencies {
         minecraft "com.mojang:minecraft:${minecraft_version}"
-        // layered mappings - Mojmap names, parchment and QM docs and parameters
+        // layered mappings - Mojmap names, parchment docs and parameters
         mappings(loom.layered {
-            it.mappings("org.quiltmc:quilt-mappings:${minecraft_version}+build.${qm_version}:intermediary-v2")
+            it.officialMojangMappings()
             it.parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
-            it.officialMojangMappings { nameSyntheticMembers = false }
         })
 
         // see each subproject for dependencies.
@@ -59,7 +48,7 @@ subprojects {
         publications {
             mavenJava(MavenPublication) {
                 artifactId = rootProject.archives_base_name
-                version = "${mod_version}${ci ? "-nightly-${getGitHash}" : ""}+${project.name}-${minecraft_version}"
+                version = "${mod_version}${ci ? "-nightly-${getGitHash()}" : ""}+${project.name}-${minecraft_version}"
                 from components.java
             }
         }
@@ -89,7 +78,7 @@ allprojects {
     archivesBaseName = rootProject.archives_base_name
     group = rootProject.maven_group
 
-    version = "${mod_version}${ci ? "-nightly-${getGitHash}" : ""}+${project.name}-${minecraft_version}"
+    version = "${mod_version}${ci ? "-nightly-${getGitHash()}" : ""}+${project.name}-${minecraft_version}"
 
     repositories {
 
@@ -97,14 +86,13 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+        options.release = 21
     }
 
     java {
         withSourcesJar()
-    }
-
-    machete {
-        // disable machete locally for faster builds
-        enabled = ci
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
 }

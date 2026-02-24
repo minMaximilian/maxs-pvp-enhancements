@@ -34,7 +34,7 @@ public class HealChunk {
                     .asItem())));
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity != null) {
-                CompoundTag compoundTag = blockEntity.saveWithFullMetadata();
+                CompoundTag compoundTag = blockEntity.saveWithFullMetadata(level.registryAccess());
                 spawnStorageContents(compoundTag, level, blockPos);
             }
         }
@@ -55,7 +55,7 @@ public class HealChunk {
             .getAllKeys()
             .size() != 0) {
             level.setBlockEntity(
-                BlockEntity.loadStatic(blockPos, blockTracker.getBlockState(), blockTracker.getCompoundTag()));
+                BlockEntity.loadStatic(blockPos, blockTracker.getBlockState(), blockTracker.getCompoundTag(), level.registryAccess()));
         }
         level.playSound(null, blockPos
             .getX(), blockPos
@@ -82,7 +82,7 @@ public class HealChunk {
         if (items != null) {
             for (int i = 0; i < items.size(); i++) {
                 level.addFreshEntity(new ItemEntity(level, blockPos.getX(), blockPos.getY(), blockPos.getZ(),
-                    ItemStack.of(items.getCompound(i))));
+                    ItemStack.parseOptional(level.registryAccess(), items.getCompound(i))));
             }
         }
     }

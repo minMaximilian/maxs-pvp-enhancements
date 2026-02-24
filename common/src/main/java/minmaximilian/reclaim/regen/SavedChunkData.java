@@ -8,6 +8,7 @@ import java.util.Map;
 
 import minmaximilian.reclaim.regen.util.BlockTracker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -25,17 +27,16 @@ public class SavedChunkData extends SavedData {
         return server.overworld()
             .getDataStorage()
             .computeIfAbsent(
-                SavedChunkData::load,
-                SavedChunkData::new,
+                new SavedData.Factory<>(SavedChunkData::new, SavedChunkData::load, DataFixTypes.SAVED_DATA_RANDOM_SEQUENCES),
                 MOD_ID
             );
     }
 
-    private static SavedChunkData load(CompoundTag compoundTag) {
+    private static SavedChunkData load(CompoundTag compoundTag, HolderLookup.Provider registries) {
         ListTag resourceLocations = compoundTag.getList("resourceLocations", Tag.TAG_COMPOUND);
         for (int i = 0; i < resourceLocations.size(); i++) {
             CompoundTag resourceLocation = resourceLocations.getCompound(i);
-            ResourceLocation resourceName = new ResourceLocation(resourceLocation.get("resourceName")
+            ResourceLocation resourceName = ResourceLocation.parse(resourceLocation.get("resourceName")
                 .getAsString());
             ListTag chunks = resourceLocation.getList("chunks", Tag.TAG_COMPOUND);
             for (int j = 0; j < chunks.size(); j++) {
@@ -63,7 +64,7 @@ public class SavedChunkData extends SavedData {
         BlockState blockState = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(),
             blockTrackerTag.getCompound("blockState"));
         CompoundTag blockNbt = blockTrackerTag.getCompound("blockNbt");
-        BlockPos blockPos = NbtUtils.readBlockPos(blockTrackerTag.getCompound("blockPos"));
+        BlockPos blockPos = NbtUtils.readBlockPos(blockTrackerTag, "blockPos").orElse(BlockPos.ZERO);
         return new BlockTracker(blockState, blockNbt, blockPos);
     }
 
@@ -90,7 +91,7 @@ public class SavedChunkData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
+    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
         ListTag resourceLocations = new ListTag();
         for (Map.Entry<ResourceLocation, Map<ChunkPos, ChunkTracker>> resourceLocationMapEntry : ChunkData.getChunkTrackers()
             .entrySet()) {

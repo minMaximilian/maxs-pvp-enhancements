@@ -60,7 +60,7 @@ public class HandleExplosion {
         BlockState blockState = level.getBlockState(blockPos);
         CompoundTag compoundTag = null;
         if (blockEntity != null) {
-            compoundTag = blockEntity.saveWithFullMetadata();
+            compoundTag = blockEntity.saveWithFullMetadata(level.registryAccess());
         }
         return new BlockTracker(blockState, compoundTag, blockPos);
     }

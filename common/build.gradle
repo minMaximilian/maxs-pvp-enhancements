@@ -7,26 +7,13 @@ loom {
 }
 
 repositories {
-    // mavens for Create Fabric and dependencies
-    maven { url = "https://mvn.devos.one/#/" }
-    maven { url = "https://api.modrinth.com/maven" } // LazyDFU
-    maven { url = "https://maven.terraformersmc.com/releases/" } // Mod Menu
-    maven { url = "https://mvn.devos.one/snapshots/" }
-    // Create Fabric, Porting Lib, Forge Tags, Milk Lib, Registrate Fabric
-    maven { url = "https://cursemaven.com" } // Forge Config API Port
-    maven { url = "https://maven.realrobotix.me/master" }
-    maven { url = "https://maven.cafeteria.dev/releases" } // Fake Player API
-    maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
-    maven { url = "https://jitpack.io/" } // Mixin Extras, Fabric ASM
+    maven { url = "https://api.modrinth.com/maven" }
 }
 
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
-    modImplementation("com.tterrag.registrate_fabric:Registrate:${registrate_fabric_version}")
-
-    // Compatibilities
-    modApi("com.simibubi.create:create-fabric-${minecraft_version}:${create_fabric_version}")
-    modApi("com.rbasamoyai:createbigcannons-fabric-${minecraft_version}:${cbc_version}")
+    modImplementation("dev.architectury:architectury:${architectury_api_version}")
+    modCompileOnly("maven.modrinth:forge-config-api-port:v${forge_config_api_port_version}-1.21.1-Fabric")
 }
 
 sourceSets.main {

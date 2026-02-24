@@ -15,14 +15,11 @@
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
-    "preLaunch": [
-      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
-    ],
     "main": [
       "minmaximilian.reclaim.fabric.ReclaimImpl"
     ],
-    "fabric-datagen": [
-      "minmaximilian.reclaim.data.fabric.DataGenFabric"
+    "client": [
+      "minmaximilian.reclaim.fabric.ReclaimClientImpl"
     ]
   },
   "mixins": [
@@ -30,8 +27,9 @@
     "reclaim-common.mixins.json"
   ],
   "depends": {
-    "minecraft": "${minecraft_version}",
+    "minecraft": "~1.21.1",
     "fabricloader": ">=${fabric_loader_version}",
-    "fabric-api": ">=${fabric_api_version}"
+    "fabric-api": ">=${fabric_api_version}",
+    "forgeconfigapiport": "*"
   }
 }

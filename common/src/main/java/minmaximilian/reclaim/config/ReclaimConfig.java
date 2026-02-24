@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.fml.config.ModConfig;
 
 public class ReclaimConfig {
 
@@ -20,7 +20,7 @@ public class ReclaimConfig {
         return CONFIGS.get(type);
     }
 
-    public static void registerConfigs(BiConsumer<ModConfig.Type, ForgeConfigSpec> cons) {
+    public static void registerConfigs(BiConsumer<ModConfig.Type, ModConfigSpec> cons) {
         COMMON = register(ReclaimCommonConfig::new, ModConfig.Type.COMMON);
 
         for (Map.Entry<ModConfig.Type, ConfigBase> pair : CONFIGS.entrySet()) {
@@ -29,7 +29,7 @@ public class ReclaimConfig {
     }
 
     private static <T extends ReclaimBase> T register(Supplier<T> factory, ModConfig.Type side) {
-        Pair<T, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(builder -> {
+        Pair<T, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(builder -> {
             T config = factory.get();
             config.registerAll(builder);
             return config;

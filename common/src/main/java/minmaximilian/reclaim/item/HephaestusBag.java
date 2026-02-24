@@ -4,14 +4,15 @@ import java.util.Objects;
 
 import minmaximilian.reclaim.regen.handlers.HandleLevelTick;
 import minmaximilian.reclaim.regen.util.ChunkPosUtils;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -26,21 +27,18 @@ public class HephaestusBag extends Item {
     }
 
     public boolean isCharged(ItemStack stack) {
-        return stack.getOrCreateTag().getBoolean(NBT_KEY_CHARGED);
+        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        return customData.copyTag().getBoolean(NBT_KEY_CHARGED);
     }
 
     public void setCharged(ItemStack stack, boolean charged) {
-        stack.getOrCreateTag().putBoolean(NBT_KEY_CHARGED, charged);
+        stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data ->
+            data.update(tag -> tag.putBoolean(NBT_KEY_CHARGED, charged)));
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
         return isCharged(stack);
-    }
-
-    @Override
-    public boolean canBeHurtBy(DamageSource damageSource) {
-        return false;
     }
 
     @Override
@@ -55,8 +53,6 @@ public class HephaestusBag extends Item {
         }
 
         Vec3 lastScanCenter = Objects.requireNonNull(player.position());
-
-//        ScannerRenderer.INSTANCE.ping(lastScanCenter);
 
         level.playSound(null, player.getOnPos().above(10), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 1.0F,
             0.8F + 0.4F * level.getRandom().nextFloat());

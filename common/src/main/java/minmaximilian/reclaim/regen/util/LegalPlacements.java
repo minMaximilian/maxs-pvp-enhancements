@@ -21,10 +21,6 @@ public class LegalPlacements {
     }
 
     public static boolean filterBlock(BlockState blockState, Explosion explosion) {
-        if (!blockState.getBlock()
-            .dropFromExplosion(explosion)) {
-            return false;
-        }
         return filterBlocksInner(blockState);
     }
 }

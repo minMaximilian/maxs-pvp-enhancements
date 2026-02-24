@@ -24,16 +24,14 @@ public class HandleCreateBigCannons {
     private static void handlePenetration(Level level, BlockState blockState, BlockPos blockPos) {
         ResourceLocation resourceLocation = level.dimension().location();
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
-        BlockTracker blockTracker = createBlockTracker(blockPos, blockState, blockEntity);
+        BlockTracker blockTracker = createBlockTracker(level, blockPos, blockState, blockEntity);
         ChunkData.upsertSingle(resourceLocation, new ChunkPos(blockPos), blockTracker);
     }
 
-
-    private static BlockTracker createBlockTracker(BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+    private static BlockTracker createBlockTracker(Level level, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
         if (blockEntity != null) {
-            return new BlockTracker(blockState, blockEntity.saveWithFullMetadata(), blockPos);
+            return new BlockTracker(blockState, blockEntity.saveWithFullMetadata(level.registryAccess()), blockPos);
         }
         return new BlockTracker(blockState, null, blockPos);
     }
 }
-
