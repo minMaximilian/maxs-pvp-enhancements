@@ -14,7 +14,8 @@ public class LegalPlacements {
     private static boolean filterBlocksInner(BlockState blockState) {
         return switch (BLOCK.getKey(blockState.getBlock())
             .toString()) {
-            case "minecraft:air", "minecraft:void_air", "minecraft:cave_air", "minecraft:fire", "minecraft:water", "minecraft:lava" ->
+            case "minecraft:air", "minecraft:void_air", "minecraft:cave_air", "minecraft:fire", "minecraft:water",
+                "minecraft:lava", "minecraft:tnt" ->
                 false;
             default -> true;
         };

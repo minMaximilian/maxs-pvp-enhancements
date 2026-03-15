@@ -20,6 +20,9 @@
     ],
     "client": [
       "minmaximilian.reclaim.fabric.ReclaimClientImpl"
+    ],
+    "fabric-datagen": [
+      "minmaximilian.reclaim.data.fabric.DataGenFabric"
     ]
   },
   "mixins": [

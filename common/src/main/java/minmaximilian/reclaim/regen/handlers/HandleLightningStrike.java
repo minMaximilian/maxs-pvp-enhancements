@@ -15,6 +15,7 @@ public class HandleLightningStrike {
             && item.getItem().getItem() == ReclaimItems.HEPHAESTUS_BAG.get()) {
             item.getItem().update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data ->
                 data.update(tag -> tag.putBoolean(HephaestusBag.NBT_KEY_CHARGED, true)));
+            item.clearFire();
             return true;
         }
         return false;

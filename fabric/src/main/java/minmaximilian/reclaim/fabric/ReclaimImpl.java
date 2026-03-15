@@ -12,6 +12,10 @@ public class ReclaimImpl implements ModInitializer {
     public void onInitialize() {
         Reclaim.init();
 
+        if (System.getProperty("fabric-api.datagen") != null) {
+            return;
+        }
+
         ReclaimConfig.registerConfigs(
             (t, c) -> NeoForgeConfigRegistry.INSTANCE.register(Reclaim.MOD_ID, t, c));
 

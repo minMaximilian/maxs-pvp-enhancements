@@ -14,11 +14,16 @@ public class Reclaim {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "reclaim";
     public static final SavedChunkDataManager SAVED_CHUNKS = new SavedChunkDataManager();
+    private static boolean initialized;
 
     public static void init() {
-        ReclaimCreativeModeTab.register();
+        if (initialized) {
+            return;
+        }
+        initialized = true;
         ReclaimBlocks.register();
         ReclaimItems.register();
+        ReclaimCreativeModeTab.register();
     }
 
     public static ResourceLocation asResource(String name) {
